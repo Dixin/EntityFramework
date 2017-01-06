@@ -627,6 +627,12 @@ namespace Microsoft.EntityFrameworkCore.Query
                 () => base.VisitGroupJoinClause(groupJoinClause, queryModel, index),
                 LinqOperatorProvider.GroupJoin,
                 groupJoin: true);
+
+            // Workaround until #6647 is addressed - if GroupJoin is present, result operators should always be performed on the client
+            // GroupJoin requires materialization of entire entity which results in all columns of that entity being projected
+            // this in turn results in result operators being applied on all of those columns, even if the query specifies a subset 
+            // of columns to perform the operation on - this could lead to incorrect results (e.g. for Distinct)
+            RequiresClientResultOperator = true;
         }
 
         /// <summary>

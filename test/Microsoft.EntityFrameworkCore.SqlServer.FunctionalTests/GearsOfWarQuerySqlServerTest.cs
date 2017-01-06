@@ -2049,6 +2049,31 @@ ORDER BY [w].[OwnerFullName]",
                 Sql);
         }
 
+        public override void Distinct_with_optional_navigation_is_evaluated_on_client()
+        {
+            base.Distinct_with_optional_navigation_is_evaluated_on_client();
+
+            Assert.Equal(
+                @"SELECT [g].[Nickname], [g].[SquadId], [g].[AssignedCityName], [g].[CityOrBirthName], [g].[Discriminator], [g].[FullName], [g].[HasSoulPatch], [g].[LeaderNickname], [g].[LeaderSquadId], [g].[Rank], [g.Tag].[Id], [g.Tag].[GearNickName], [g.Tag].[GearSquadId], [g.Tag].[Note]
+FROM [Gear] AS [g]
+LEFT JOIN [CogTag] AS [g.Tag] ON ([g].[Nickname] = [g.Tag].[GearNickName]) AND ([g].[SquadId] = [g.Tag].[GearSquadId])
+WHERE [g].[Discriminator] IN (N'Officer', N'Gear') AND (([g.Tag].[Note] <> N'Foo') OR [g.Tag].[Note] IS NULL)",
+                Sql);
+        }
+
+        public override void Sum_with_optional_navigation_is_evaluated_on_client()
+        {
+            base.Sum_with_optional_navigation_is_evaluated_on_client();
+
+            Assert.Equal(
+                @"SELECT [g].[Nickname], [g].[SquadId], [g].[AssignedCityName], [g].[CityOrBirthName], [g].[Discriminator], [g].[FullName], [g].[HasSoulPatch], [g].[LeaderNickname], [g].[LeaderSquadId], [g].[Rank], [g.Tag].[Id], [g.Tag].[GearNickName], [g.Tag].[GearSquadId], [g.Tag].[Note]
+FROM [Gear] AS [g]
+LEFT JOIN [CogTag] AS [g.Tag] ON ([g].[Nickname] = [g.Tag].[GearNickName]) AND ([g].[SquadId] = [g.Tag].[GearSquadId])
+WHERE [g].[Discriminator] IN (N'Officer', N'Gear') AND (([g.Tag].[Note] <> N'Foo') OR [g.Tag].[Note] IS NULL)
+ORDER BY [g].[Nickname], [g].[SquadId]",
+                Sql);
+        }
+
         protected override void ClearLog() => TestSqlLoggerFactory.Reset();
 
         private const string FileLineEnding = @"

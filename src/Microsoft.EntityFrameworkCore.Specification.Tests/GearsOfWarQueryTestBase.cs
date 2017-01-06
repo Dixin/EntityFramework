@@ -2053,6 +2053,38 @@ namespace Microsoft.EntityFrameworkCore.Specification.Tests
             }
         }
 
+        [ConditionalFact]
+        public virtual void Distinct_with_optional_navigation_is_evaluated_on_client()
+        {
+            using (var context = CreateContext())
+            {
+                var query = (from g in context.Gears
+                             where g.Tag.Note != "Foo"
+                             select g.HasSoulPatch).Distinct();
+
+                var result = query.ToList();
+                Assert.Equal(2, result.Count);
+            }
+        }
+
+        [ConditionalFact]
+        public virtual void Sum_with_optional_navigation_is_evaluated_on_client()
+        {
+            using (var context = CreateContext())
+            {
+                var expected = (from g in context.Gears.ToList()
+                                select g.SquadId).Sum();
+
+                ClearLog();
+
+                var actual = (from g in context.Gears
+                             where g.Tag.Note != "Foo"
+                             select g.SquadId).Sum();
+
+                Assert.Equal(expected, actual);
+            }
+        }
+
         protected GearsOfWarContext CreateContext() => Fixture.CreateContext(TestStore);
 
         protected GearsOfWarQueryTestBase(TFixture fixture)
