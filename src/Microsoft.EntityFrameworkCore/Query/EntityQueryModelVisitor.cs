@@ -74,7 +74,7 @@ namespace Microsoft.EntityFrameworkCore.Query
         public static Expression CreatePropertyExpression([NotNull] Expression target, [NotNull] IProperty property)
             => Expression.Call(
                 null,
-                EF.PropertyMethod.MakeGenericMethod(property.ClrType.MakeNullable()),
+                EF.PropertyMethod.MakeGenericMethod(property.ClrType),
                 target,
                 Expression.Constant(property.Name));
 
